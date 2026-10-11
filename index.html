@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<script>
+  (function() {
+    var GA_ID = 'G-GEFWFCYQQP';
+    var isLocalDev = ['localhost', '127.0.0.1', ''].includes(location.hostname);
+    if (isLocalDev) return;
+    try { if (/[?&]no_ga=0/.test(location.search)) localStorage.removeItem('no_ga'); if (/[?&]no_ga=1/.test(location.search)) localStorage.setItem('no_ga', '1'); if (localStorage.getItem('no_ga') === '1') return; } catch (e) {}
+    var gaQ = new URLSearchParams(location.search); if (gaQ.get('obs') === '1' || gaQ.get('no_ga') === '1') return;
+    var s = document.createElement('script');
+    s.async = true;
+    s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
+    document.head.appendChild(s);
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', GA_ID);
+    document.addEventListener('click', function(e) {
+      var a = e.target && e.target.closest ? e.target.closest('a[href*="booth.pm"]') : null;
+      if (!a) return;
+      gtag('event', 'booth_click', { link_url: a.href, link_id: a.id || '', link_text: (a.textContent || '').trim().slice(0, 40) });
+    });
+  })();
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="相関図をブラウザで簡単に無料作成できるツール。人物を入れて矢印でつなぐだけで、創作・うちの子・推し・家族の人物相関図が作れます。線の文字・向き・色・点線、画像アイコン、同じ2人の間の2本の線、学園もの・家族のテンプレートつき。PNG画像で保存してSNSに投稿できます。登録不要・スマホでも作れます。">
+<link rel="canonical" href="https://uuhai0625.github.io/soukanzu-maker/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:title" content="相関図メーカー|人物相関図を無料で作成(創作・推し・キャラの関係図、画像で保存)">
+<meta property="og:description" content="相関図をブラウザで簡単に無料作成できるツール。人物を入れて矢印でつなぐだけで、創作・うちの子・推し・家族の人物相関図が作れます。線の文字・向き・色・点線、画像アイコン、同じ2人の間の2本の線、学園もの・家族のテンプレートつき。PNG画像で保存してSNSに投稿できます。登録不要・スマホでも作れます。">
+<meta property="og:url" content="https://uuhai0625.github.io/soukanzu-maker/">
+<meta property="og:image" content="https://uuhai0625.github.io/soukanzu-maker/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<title>相関図メーカー|人物相関図を無料で作成(創作・推し・キャラの関係図、画像で保存)</title>
+<style>
+  :root {
+    --bg: #f7f5fb;
+    --panel: #ffffff;
+    --border: #e2dcef;
+    --field-border: #7d7394;
+    --text: #26222e;
+    --muted: #5d566b;
+    --accent: #6a3fb5;
+    --accent-dark: #4a2a85;
+    --soft: #f1ebfb;
+    --ng: #b3261e;
+    --locked: #cbbfe0;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; }
+  header { background: linear-gradient(135deg, var(--accent), var(--accent-dark)); color: #fff; padding: 24px 20px 18px; text-align: center; }
+  header h1 { margin: 0 0 6px; font-size: 1.35rem; }
+  header p { margin: 0; font-size: .9rem; }
+  main { max-width: 1180px; margin: 0 auto; padding: 22px 16px 50px; }
+  main > * { min-width: 0; }
+  .layout { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+  .layout > div { min-width: 0; }
+  .layout > .col-cv { position: sticky; top: 12px; }
+  section.card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; margin-bottom: 18px; }
+  section.card h2 { margin: 0 0 6px; font-size: 1.05rem; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .desc { color: var(--muted); font-size: .84rem; margin: 0 0 12px; }
+  .fine { color: var(--muted); font-size: .8rem; margin: 8px 0 0; }
+  .badge { display: inline-block; font-size: .7rem; padding: 2px 8px; border-radius: 999px; background: #fff1cc; color: #7a5600; font-weight: bold; }
+  .count { font-size: .78rem; color: var(--muted); font-weight: normal; }
+  .hidden { display: none !important; }
+  label.field { display: block; margin-bottom: 12px; }
+  .lbl { font-size: .85rem; font-weight: bold; display: block; }
+  .hint { font-size: .78rem; color: var(--muted); font-weight: normal; display: block; margin-top: 2px; }
+  input[type=text], select { width: 100%; margin-top: 5px; padding: 8px 10px; min-height: 44px; border: 1px solid var(--field-border); border-radius: 8px; font-size: 1rem; font-family: inherit; background: #fff; color: var(--text); }
+  input[type=text]:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .row2 { display: flex; gap: 12px; }
+  .row2 > * { flex: 1; min-width: 0; }
+  label.check { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-size: .86rem; cursor: pointer; }
+  label.check input { width: 20px; height: 20px; margin: 0; flex-shrink: 0; }
+  .btn-row { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  .btn { min-height: 44px; padding: 9px 16px; border-radius: 8px; font-size: .88rem; cursor: pointer; border: 1px solid var(--field-border); background: #fff; color: var(--text); font-family: inherit; display: inline-flex; align-items: center; justify-content: center; text-align: center; }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: bold; }
+  .btn.on { background: var(--soft); border-color: var(--accent); color: var(--accent-dark); font-weight: bold; }
+  .btn.small { min-height: 44px; padding: 6px 12px; font-size: .82rem; }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+  .btn:focus-visible, label.btn:focus-within { outline: 2px solid var(--accent-dark); outline-offset: 2px; }
+  .vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .status { font-size: .82rem; color: var(--muted); margin-top: 6px; min-height: 1.2em; }
+  .status.err, .err { color: var(--ng); font-weight: bold; }
+  .limit { font-size: .84rem; margin: 8px 0 0; padding: 8px 10px; border-radius: 8px; background: #fff7e0; color: #5c4400; }
+  .limit a { color: var(--accent-dark); font-weight: bold; }
+  .cv-wrap { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: #eee; }
+  #cv { display: block; width: auto; max-width: 100%; height: auto; max-height: calc(100vh - 230px); margin: 0 auto; touch-action: none; cursor: default; }
+  .cv-wrap.zoom { overflow: auto; max-height: 75vh; }
+  .cv-wrap.zoom #cv { width: 220%; max-width: none; max-height: none; }
+  #cv:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }
+  #cv.connecting { cursor: crosshair; }
+  .toolbar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+  .toolbar .btn { flex: 1 1 auto; }
+  .item { border: 1px solid var(--border); border-left: 6px solid #999; border-radius: 10px; padding: 8px 12px 10px; margin-bottom: 10px; background: #fff; }
+  .item.sel { box-shadow: 0 0 0 2px var(--accent); }
+  .item input[type=text], .item select { margin-top: 2px; }
+  .item .row2 { gap: 8px; }
+  .item .mini { display: block; font-size: .74rem; color: var(--muted); }
+  .item .ctrls { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end; margin-top: 8px; }
+  .item .ctrls > .mini { flex: 1 1 7em; }
+  .item .ctrls .btn { flex: 0 0 auto; }
+  .item .arrow-mid { flex: 0 0 auto; align-self: flex-end; padding-bottom: 10px; color: var(--muted); font-weight: bold; }
+  .empty { color: var(--muted); font-size: .84rem; margin: 0 0 8px; }
+  .tpl-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 6px; }
+  .tpl-row .sep { flex: 1 1 auto; }
+  .guide { font-size: .86rem; }
+  .guide ul, .guide ol { padding-left: 1.3em; margin: 6px 0; }
+  .guide li { margin: 4px 0; }
+  .locked-panel { border: 1px dashed var(--locked); border-radius: 10px; padding: 16px; text-align: center; color: var(--muted); background: #fbf9fe; }
+  .locked-panel .lead { color: var(--text); font-weight: bold; }
+  .locked-panel .feat-list { text-align: left; max-width: 640px; margin: 10px auto; font-size: .85rem; padding-left: 1.2em; }
+  .buy-btn { display: inline-block; margin-top: 8px; background: var(--accent-dark); color: #fff; font-weight: bold; padding: 11px 22px; border-radius: 999px; text-decoration: none; font-size: .9rem; }
+  
+  footer { max-width: 1180px; margin: 0 auto; padding: 0 16px 40px; font-size: .8rem; color: var(--muted); }
+  footer a { color: var(--muted); }
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: minmax(0, 1fr); }
+    .layout > .col-cv { position: static; }
+    #cv { max-height: none; width: 100%; }
+  }
+  @media (max-width: 600px) {
+    .row2 { flex-direction: column; gap: 0; }
+    .item .row2 { gap: 6px; }
+    .item .arrow-mid { display: none; }
+    section.card { padding: 16px 14px; }
+  }
+</style>
+<!--ANSHIN_CSS_START--><style>:root{--anshin-w:1148px;--anshin-pad:16px}.anshin-strip,.anshin{box-sizing:border-box;width:min(var(--anshin-w),calc(100% - 2 * var(--anshin-pad)));margin-left:auto;margin-right:auto}.anshin-strip{list-style:none;margin-top:10px;margin-bottom:0;padding:0;display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;font-size:.8rem;line-height:1.5}.anshin-strip li{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border:1px solid rgba(20,120,90,.45);border-radius:999px;background:rgba(20,120,90,.07)}.anshin-strip li.anshin-more{border:0;background:none;padding:3px 2px}.anshin-strip a,.anshin a{color:inherit}.anshin{margin-top:18px;margin-bottom:18px;padding:14px 18px;border:1px solid rgba(20,120,90,.45);border-radius:10px;background:rgba(20,120,90,.05);font-size:.86rem;line-height:1.7}.anshin h2{font-size:1rem;margin:0 0 6px}.anshin p{margin:0 0 6px}.anshin ul{margin:0;padding-left:1.2em}.anshin li{margin:3px 0}.anshin details{margin-top:6px}.anshin summary{cursor:pointer;font-weight:bold}.anshin .anshin-meta{margin:8px 0 0;font-size:.8rem;opacity:.85}@media print{.anshin,.anshin-strip{display:none!important}}</style><!--ANSHIN_CSS_END-->
+</head>
+<body>
+
+<header>
+  <h1>相関図メーカー(人物相関図の作成ツール)</h1>
+  <p>創作・うちの子・推しの関係を、矢印でつないで1枚の画像に。10人まで無料、登録不要・スマホでも作れます</p>
+</header>
+<!--ANSHIN_STRIP_START-->
+<ul class="anshin-strip" aria-label="データの扱い">
+  <li><span aria-hidden="true">✓</span> 入力内容はこの端末の中だけで処理</li>
+  <li><span aria-hidden="true">✓</span> 登録・ログイン不要</li>
+  <li><span aria-hidden="true">✓</span> 仕組みを公開中</li>
+  <li class="anshin-more"><a href="#anshin">データの扱いをくわしく</a></li>
+</ul>
+<!--ANSHIN_STRIP_END-->
+
+<main>
+<div class="layout">
+<div class="col-cv">
+  <section class="card" id="cv-card">
+    <h2>相関図</h2>
+    <div class="toolbar">
+      <button class="btn small" type="button" id="connectBtn">線でつなぐ</button>
+      <button class="btn small" type="button" id="undoBtn" disabled>1つ戻す</button>
+      <button class="btn small" type="button" id="arrangeBtn">自動で並べる</button>
+      <button class="btn small" type="button" id="zoomBtn" aria-pressed="false">図を拡大</button>
+    </div>
+    <div class="cv-wrap" id="cvWrap">
+      <canvas id="cv" width="1600" height="900" tabindex="0" role="img" aria-label="相関図のプレビュー。人物の追加や編集は、下の一覧からできます。図を選んでからNキーで人を順に選び、矢印キーで動かせます。"></canvas>
+    </div>
+    <div class="status" id="st" role="status" aria-live="polite"></div>
+    <p class="fine">人はドラッグで動かせます。線の文字(吹き出し)を押すと線を選べ、ダブルクリックすると一覧の入力欄へ移ります。スマホで細かく動かすときは「図を拡大」を使ってください(何もないところをなぞると図が動きます)。</p>
+    <p class="fine" id="relHidden"></p>
+  </section>
+</div>
+<div>
+
+  <section class="card" id="set-card">
+    <h2>① 図の設定</h2>
+    <label class="field">
+      <span class="lbl">タイトル(なしでもOK)</span>
+      <input type="text" id="in-title" maxlength="30" placeholder="例: ○○高校 人物相関図">
+    </label>
+    <div class="row2">
+      <label class="field">
+        <span class="lbl">画像の形</span>
+        <select id="in-size">
+          <option value="wide">横長 16:9(X・YouTube向け)</option>
+          <option value="square">正方形(スマホで大きく見える)</option>
+          <option value="tall">縦長 4:5(Instagram向け)</option>
+        </select>
+      </label>
+      <label class="field">
+        <span class="lbl">文字と丸の大きさ</span>
+        <select id="in-zoom">
+          <option value="s">小さめ(人が多いとき)</option>
+          <option value="m" selected>ふつう</option>
+          <option value="l">大きめ(スマホで読みやすい)</option>
+        </select>
+      </label>
+    </div>
+    <label class="field">
+      <span class="lbl">背景</span>
+      <select id="in-bg">
+        <option value="white">白</option>
+        <option value="cream">生成り(うすいベージュ)</option>
+        <option value="grid">方眼</option>
+        <option value="pastel">パステル(ピンク→水色)</option>
+        
+      </select>
+    </label>
+    <span class="lbl">テンプレート(見本)から始める</span>
+    <div class="tpl-row">
+      <button class="btn small" type="button" data-tpl="school">学園もの</button>
+      <button class="btn small" type="button" data-tpl="family">家族</button>
+      <span class="sep"></span>
+      <button class="btn small" type="button" data-tpl="clear">全部消して最初から</button>
+    </div>
+  </section>
+
+  <section class="card" id="people-card">
+    <h2>② 人物 <span class="count" id="peopleCount"></span></h2>
+    <p class="desc">名前の下に小さく出る「ひとこと」には、肩書きや年齢などを入れられます。画像を選ぶと丸いアイコンになります(画像はこのブラウザの中だけで使い、どこにも送信しません)。</p>
+    <div id="peopleList"></div>
+    <div class="btn-row"><button class="btn primary" type="button" id="addPersonBtn">人物を追加</button></div>
+    <p class="limit hidden" id="peopleLimit">無料版で入れられるのは10人までです。<a href="https://uuhai0625.booth.pm/items/8970456" target="_blank" rel="noopener">買い切り版(¥100・パソコン用)なら100人まで</a></p>
+    <div class="status" id="peopleSt" role="status"></div>
+  </section>
+
+  <section class="card" id="rel-card">
+    <h2>③ 関係(線) <span class="count" id="relCount"></span></h2>
+    <p class="desc">線は図の上の「線でつなぐ」でも引けます。同じ2人の間に、向きのちがう線を2本引くこともできます(少しずらして描きます)。</p>
+    <div id="relList"></div>
+    <div class="btn-row"><button class="btn" type="button" id="addRelBtn">線を追加</button></div>
+    <p class="limit hidden" id="relLimit">無料版で引ける線は40本までです。<a href="https://uuhai0625.booth.pm/items/8970456" target="_blank" rel="noopener">買い切り版(¥100・パソコン用)なら300本まで</a></p>
+    <div class="status" id="relSt" role="status"></div>
+  </section>
+
+  
+
+  <section class="card" id="save-card">
+    <h2>④ 画像で保存</h2>
+    
+    <div class="btn-row"><button class="btn primary" type="button" id="pngBtn">画像で保存(PNG)</button></div>
+    <div class="status" id="saveSt" role="status"></div>
+    <p class="fine">作っている図は、このブラウザに自動で保存されます(次に開いたときも続きから)。スマホでは、保存した画像を「ファイル」や写真アプリに移してから投稿してください。</p>
+    
+  </section>
+
+</div>
+</div>
+
+  <section class="card" id="pro-section">
+    <h2>登場人物が多い作品も、グループごとに整理して <span class="badge">買い切り版 ¥100(税込)</span></h2>
+    <div class="locked-panel">
+      <p class="lead">パソコン向けの買い切り版です。長編や大人数のグループも、1枚にまとめて高画質で。</p>
+      <p>このページの機能は無料でそのまま使えます(スマホだけで使う方は、このページで十分です)。買い切り版(ダウンロード購入)では、次の機能が増えます:</p>
+      <ul class="feat-list">
+        <li><strong>人物100人・線300本まで</strong>(無料版は10人・40本まで)</li>
+        <li><strong>グループの囲み</strong>: 「○○家」「生徒会」のように人をまとめる枠と見出し。枠を動かすと中の人も一緒に動きます</li>
+        <li><strong>高画質(2倍・3倍)・背景の透明化・右下のクレジットなし</strong>で画像を保存</li>
+        <li><strong>作品ごとにファイルへ書き出し・読み込み</strong>(いくつもの相関図の作り分けや、ほかのパソコンへの移動に)</li>
+        <li><strong>背景の追加</strong>: 黒・夜空</li>
+        <li><strong>パソコンで使うHTMLファイルです</strong>(スマホでの動作は保証していません)。ダブルクリックで開くだけ、ネットにつながっていなくても使えます</li>
+      </ul>
+      <a class="buy-btn" href="https://uuhai0625.booth.pm/items/8970456" id="buyLink" target="_blank" rel="noopener">買い切り版を見る(BOOTH・新しいタブ)</a>
+    </div>
+  </section>
+
+  <section class="card guide" id="guide">
+    <h2>相関図の作り方</h2>
+    <ol>
+      <li>②の「人物を追加」で人を入れ、名前とひとこと(肩書きなど)を書きます。画像を選ぶと丸いアイコンになります。</li>
+      <li>図の上の「線でつなぐ」を押して、矢印の元の人 → 先の人の順に押すと線が引けます。線の文字(「好き」「ライバル」など)・向き・色・点線は③で変えられます。</li>
+      <li>人はドラッグで動かせます。「自動で並べる」で、円の形に並べ直すこともできます。</li>
+      <li>④の「画像で保存」でPNG画像にして、SNSに載せたり、資料に貼ったりできます。</li>
+    </ol>
+    <h2 style="margin-top:16px;">相関図のよくある疑問</h2>
+    <ul>
+      <li><strong>人物相関図とは?</strong> 登場人物どうしの関係(家族・恋愛・友だち・ライバルなど)を、矢印と短い言葉で1枚にまとめた図です。小説や漫画の設定づくり、ドラマやアニメの整理によく使われます。</li>
+      <li><strong>創作向けの相関図テンプレートは?</strong> ①の「学園もの」「家族」のテンプレートから始めて、名前と線の文字を書きかえるのがかんたんです。</li>
+      <li><strong>創作・うちの子の相関図</strong>: オリジナルキャラクターの関係の整理に使えます。「片思い」と「気づいていない」のように、2人の間に向きのちがう線を2本引くこともできます。</li>
+      <li><strong>推しの相関図</strong>: メンバーやキャラクターの関係をまとめるのにも使えます。実在の人の写真や公式のイラストは、無断で使えないことが多いので、アイコンに使って公開する前に作品や事務所のガイドラインを必ず確認してください。実在の人どうしの関係を書くときは、本人が見ても困らない言葉にしておくと安心です。</li>
+      <li><strong>エクセルやパワポとのちがい</strong>: 図形を1つずつ並べなくても、人と線を入れるだけで、矢印が人の丸の外側から引かれます。人を動かすと線もついてきます。</li>
+      <li><strong>スマホでも作れる?</strong> 作れます。人は指で動かせます。細かく動かすときは「図を拡大」を使ってください。保存した画像は、写真アプリや「ファイル」に移して使ってください。</li>
+      <li><strong>入れた名前や画像は?</strong> このブラウザの中だけで処理・保存し、どこにも送信しません。共有のパソコンで使うときは、終わったら「全部消して最初から」で消しておくと安心です。</li>
+    </ul>
+  </section>
+
+</main>
+
+<!--ANSHIN_START-->
+<section class="anshin" id="anshin" aria-labelledby="anshin-title">
+  <h2 id="anshin-title">データの扱いについて</h2>
+  <p>このページには、入力した内容を受け取る仕組みがありません。文字も画像も、あなたのスマホやパソコンの中だけで処理されます。</p>
+  <ul>
+    <li>画像などのファイルを選んでも、アップロードはされません。端末の中で読み込んで処理します。</li>
+    <li>会員登録・ログイン・メールアドレスの入力はありません。</li>
+    <li>自分で確かめたい方へ: ページを開いたあと機内モードにしても、そのまま使えます。</li>
+  </ul>
+  <details>
+    <summary>もっとくわしく(保存・アクセス解析・公開について)</summary>
+    <ul>
+      <li>保存されるデータは、この端末のこのブラウザの中にだけ残ります(localStorage)。共用のパソコンでは使い終わったら消してください。</li>
+      <li>アクセス解析(Google Analytics)のため、見たページのURL・参照元・端末やブラウザの種類・おおよその地域(IPアドレスから推定)・Cookieの識別子・BOOTHへのリンクのクリック・どのボタンを押したか(回数や選んだ設定を含む)がGoogleに送られます。目的は利用状況の把握です。入力した文字や画像は送りません。(<a href="https://policies.google.com/technologies/partner-sites?hl=ja" target="_blank" rel="noopener">Googleによるデータの使用</a>/<a href="https://tools.google.com/dlpage/gaoptout?hl=ja" target="_blank" rel="noopener">計測を止めるアドオン</a>。止めてもツールはそのまま使えます)</li>
+      <li>このツールの結果や作成物は目安です。入稿・契約・販売などの前には、印刷所や公式の情報でご確認ください。</li>
+      <li>処理の中身はすべて公開しています(詳しい方向け: <a href="https://github.com/uuhai0625/soukanzu-maker" target="_blank" rel="noopener">GitHub</a>)。</li>
+    </ul>
+  </details>
+  <p class="anshin-meta">作っている人: ウーハイ(個人開発)/不具合・ご質問は<a href="https://x.com/uuhai0625" target="_blank" rel="noopener">X(@uuhai0625)</a>へ/<a href="https://uuhai0625.github.io/" target="_blank" rel="noopener">ほかのツール</a>/この説明の更新日: 2026-10-09</p>
+</section>
+<!--ANSHIN_END-->
+
+<footer>
+  <p id="privacyNote">本ツールは完全にブラウザ内で動作し、入力した内容や画像はどこにも送信されません。</p>
+  <p><a href="https://uuhai0625.booth.pm/" target="_blank" rel="noopener">他のツールも見る(BOOTHショップ)</a></p>
+  <p>不具合・ご要望は X <a href="https://x.com/uuhai0625" target="_blank" rel="noopener">@uuhai0625</a> まで。</p>
+  <p class="related-tools no-print">関連する無料ツール: <a href="https://uuhai0625.github.io/genko-page-calc/" target="_blank" rel="noopener">小説ページ数計算</a> ・ <a href="https://uuhai0625.github.io/illust-price-list/" target="_blank" rel="noopener">イラスト料金表メーカー</a> ・ <a href="https://uuhai0625.github.io/daiwari-maker/" target="_blank" rel="noopener">台割作成ツール</a> ・ <a href="https://uuhai0625.github.io/#free-tools">ツール一覧</a></p>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var EDITION = "free"; // "full" で買い切り完全版
+
+  function track(name, params) {
+    if (!window.dataLayer) return;
+    (function () { window.dataLayer.push(arguments); })("event", name, params || {});
+  }
+  var $ = function (id) { return document.getElementById(id); };
+  function el(tag, attrs, text) {
+    var e = document.createElement(tag);
+    if (attrs) Object.keys(attrs).forEach(function (k) { if (k === "class") e.className = attrs[k]; else e.setAttribute(k, attrs[k]); });
+    if (text != null) e.textContent = text;
+    return e;
+  }
+  function setSt(id, msg, err) { var e = $(id); if (!e) return; e.textContent = msg; e.classList.toggle("err", !!err); }
+
+  var MAX_PEOPLE = 10, MAX_RELS = 40, MAX_GROUPS = 0;
+  
+  var LAST_KEY = "soukanzu_last_v1";
+  var SIZES = { wide: [1600, 900], square: [1200, 1200], tall: [1080, 1350] };
+  var ZOOMS = { s: .82, m: 1, l: 1.28 };
+  var COLORS = {
+    red: ["赤", "#c9283e"], blue: ["青", "#2560c4"], green: ["緑", "#1d8049"], orange: ["オレンジ", "#b35500"],
+    purple: ["紫", "#7a3cc4"], pink: ["ピンク", "#c2357a"], sky: ["水色", "#13789e"], brown: ["茶", "#7a4b2e"], gray: ["グレー", "#555c66"]
+  };
+  var BGS = {
+    white: { fill: "#ffffff", text: "#222222", sub: "#555555", halo: "#ffffff" },
+    cream: { fill: "#f8f3e8", text: "#2b2620", sub: "#5c5348", halo: "#f8f3e8" },
+    grid: { fill: "#ffffff", grid: "#e1e6ee", text: "#222222", sub: "#555555", halo: "#ffffff" },
+    pastel: { grad: ["#fde4ef", "#dcefff"], text: "#222222", sub: "#4a4a58", halo: "#fdf0f6" },
+    dark: { fill: "#1c1b22", text: "#ffffff", sub: "#d2cedb", halo: "#1c1b22", dark: true },
+    night: { grad: ["#141b3d", "#3d1f5c"], text: "#ffffff", sub: "#dad3ea", halo: "#22204a", dark: true }
+  };
+  var R = { s: 62, m: 80, l: 102 };
+  var SIZE_NAMES = { m: "ふつう", l: "大きめ(主人公など)", s: "小さめ" };
+  var TYPES = { one: "→ 片方から", both: "⇄ おたがい", none: "― 線だけ(矢印なし)" };
+  var FONT = '"Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif';
+  var SEG = window.Intl && Intl.Segmenter ? new Intl.Segmenter("ja", { granularity: "grapheme" }) : null;
+
+  function blank() { return { title: "", size: "wide", zoom: "m", bg: "white", people: [], rels: [], groups: [] }; }
+  var state = blank(), IMGS = {}, imgCache = {};
+  var sel = null, connecting = false, connectFrom = null, drag = null, hist = [], labelBoxes = {}, hiddenCount = 0;
+
+  // 買い切り版で差し替えるフック(無料版では何もしない)
+  var exportOpts = function () { return { scale: 1, transparent: false, credit: true }; };
+  var renderGroups = function () {};
+
+  var seq = 0;
+  function uid(p) { seq++; return p + Date.now().toString(36) + seq.toString(36); }
+  function str(v, n) { return Array.from(String(v == null ? "" : v).slice(0, n * 4).replace(/[\u0000-\u001f\u007f]/g, " ")).slice(0, n).join(""); }
+  function num(v, lo, hi, d) { v = Number(v); if (!isFinite(v)) v = d; return Math.max(lo, Math.min(hi, v)); }
+  function own(o, k) { return typeof k === "string" && Object.prototype.hasOwnProperty.call(o, k); }
+  function pById(id) { for (var i = 0; i < state.people.length; i++) if (state.people[i].id === id) return state.people[i]; return null; }
+  function rById(id) { for (var i = 0; i < state.rels.length; i++) if (state.rels[i].id === id) return state.rels[i]; return null; }
+  function gById(id) { for (var i = 0; i < state.groups.length; i++) if (state.groups[i].id === id) return state.groups[i]; return null; }
+  function dims() { return SIZES[state.size]; }
+  function Z() { return ZOOMS[state.zoom] || 1; }
+  function rad(p) { return R[p.size] * Z(); }
+  function firstChar(s) {
+    s = s.trim();
+    if (!s) return "?";
+    if (SEG) { var it = SEG.segment(s)[Symbol.iterator]().next(); if (it.value) return it.value.segment; }
+    return Array.from(s)[0];
+  }
+
+  // ===== 読み込んだデータを安全な形に直す(壊れたデータ・古い形でも落ちないように) =====
+  function sanitize(o) {
+    var out = { state: blank(), imgs: {} };
+    if (!o || typeof o !== "object") return out;
+    var im = o.imgs && typeof o.imgs === "object" ? o.imgs : {}, ok = {};
+    Object.keys(im).slice(0, 500).forEach(function (k) {
+      var v = im[k];
+      if (/^i[0-9a-z]{1,24}$/.test(k) && typeof v === "string" && v.length < 300000 && /^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(v)) ok[k] = v;
+    });
+    var s = o.state && typeof o.state === "object" ? o.state : {}, t = out.state;
+    t.title = str(s.title, 30);
+    t.size = own(SIZES, s.size) ? s.size : "wide";
+    t.zoom = own(ZOOMS, s.zoom) ? s.zoom : "m";
+    t.bg = own(BGS, s.bg) ? s.bg : "white";
+    var W = SIZES[t.size][0], H = SIZES[t.size][1], ids = new Set();
+    (Array.isArray(s.people) ? s.people : []).slice(0, MAX_PEOPLE).forEach(function (p) {
+      if (!p || typeof p !== "object") return;
+      var id = typeof p.id === "string" && /^p[0-9a-z]{1,24}$/.test(p.id) && !ids.has(p.id) ? p.id : uid("p");
+      ids.add(id);
+      var img = own(ok, p.img) ? p.img : "";
+      if (img) out.imgs[img] = ok[img]; // 人が使っている画像だけ残す
+      t.people.push({
+        id: id, name: str(p.name, 16), sub: str(p.sub, 20),
+        color: own(COLORS, p.color) ? p.color : "blue", size: own(R, p.size) ? p.size : "m",
+        img: img, x: num(p.x, 0, W, W / 2), y: num(p.y, 0, H, H / 2)
+      });
+    });
+    var rids = new Set();
+    (Array.isArray(s.rels) ? s.rels : []).forEach(function (r) {
+      if (t.rels.length >= MAX_RELS || !r || typeof r !== "object") return;
+      if (!ids.has(r.from) || !ids.has(r.to) || r.from === r.to) return;
+      var id = typeof r.id === "string" && /^r[0-9a-z]{1,24}$/.test(r.id) && !rids.has(r.id) ? r.id : uid("r");
+      rids.add(id);
+      t.rels.push({ id: id, from: r.from, to: r.to, label: str(r.label, 20), type: own(TYPES, r.type) ? r.type : "one", color: own(COLORS, r.color) ? r.color : "gray", dash: r.dash === true });
+    });
+    var gids = new Set();
+    (Array.isArray(s.groups) ? s.groups : []).slice(0, MAX_GROUPS).forEach(function (g) {
+      if (!g || typeof g !== "object") return;
+      var id = typeof g.id === "string" && /^g[0-9a-z]{1,24}$/.test(g.id) && !gids.has(g.id) ? g.id : uid("g");
+      gids.add(id);
+      var w = num(g.w, 160, W, 480), h = num(g.h, 120, H - 24, 320);
+      t.groups.push({ id: id, label: str(g.label, 16), color: own(COLORS, g.color) ? g.color : "gray", w: w, h: h, x: num(g.x, 0, W - w, 40), y: num(g.y, 24, H - h, 40) });
+    });
+    t.people.forEach(clampPIn(t));
+    return out;
+  }
+
+  // ===== テンプレート(見本) =====
+  var TPL = {
+    school: {
+      title: "人物相関図",
+      people: [["主人公", "高校2年", "red", "l", .5, .52], ["幼なじみ", "となりの家", "pink", "m", .2, .32], ["ライバル", "生徒会長", "blue", "m", .8, .32], ["親友", "同じクラス", "green", "m", .2, .74], ["先生", "担任", "gray", "m", .8, .74]],
+      rels: [[0, 1, "気になる", "one", "pink", false], [1, 0, "ずっと好き", "one", "pink", false], [0, 2, "宿敵", "both", "blue", false], [3, 0, "なんでも話せる", "both", "green", false], [4, 0, "見守る", "one", "gray", false], [2, 1, "片思い", "one", "purple", true]]
+    },
+    family: {
+      title: "わが家の相関図",
+      people: [["祖父", "", "brown", "m", .3, .26], ["祖母", "", "brown", "m", .7, .26], ["父", "", "blue", "m", .3, .52], ["母", "", "pink", "m", .7, .52], ["わたし", "", "red", "l", .3, .78], ["弟", "", "green", "m", .7, .78]],
+      rels: [[0, 1, "夫婦", "none", "brown", false], [2, 3, "夫婦", "none", "blue", false], [0, 2, "親子", "none", "gray", false], [2, 4, "親子", "none", "gray", false], [3, 5, "親子", "none", "gray", false], [4, 3, "頼りにしてる", "one", "pink", false], [4, 5, "けんか中", "both", "green", true]]
+    }
+  };
+  function fromTpl(t) {
+    var s = blank(), ids = [], W = SIZES[state.size][0], H = SIZES[state.size][1];
+    s.title = t.title; s.size = state.size; s.zoom = state.zoom; s.bg = state.bg;
+    t.people.forEach(function (a) { var id = uid("p"); ids.push(id); s.people.push({ id: id, name: a[0], sub: a[1], color: a[2], size: a[3], img: "", x: Math.round(a[4] * W), y: Math.round(a[5] * H) }); });
+    t.rels.forEach(function (a) { s.rels.push({ id: uid("r"), from: ids[a[0]], to: ids[a[1]], label: a[2], type: a[3], color: a[4], dash: a[5] }); });
+    s.people.forEach(clampPIn(s));
+    return s;
+  }
+
+  // ===== 人が動ける範囲(タイトル・名前の文字・右下のクレジットに重ならないように) =====
+  function boundsIn(s, p) {
+    var W = SIZES[s.size][0], H = SIZES[s.size][1], z = ZOOMS[s.zoom] || 1, r = R[p.size] * z;
+    var top = s.title ? 112 + r : r + 8, below = r + 92 * z + 26;
+    return { x0: r + 8, x1: W - r - 8, y0: Math.min(top, H / 2), y1: Math.max(H / 2, H - below) };
+  }
+  function clampPIn(s) { return function (p) { var b = boundsIn(s, p); p.x = Math.max(b.x0, Math.min(b.x1, p.x)); p.y = Math.max(b.y0, Math.min(b.y1, p.y)); }; }
+  function clampP(p) { clampPIn(state)(p); }
+
+  // ===== 描画(画面と画像保存で共通) =====
+  function rr(ctx, x, y, w, h, r) {
+    r = Math.min(r, w / 2, h / 2);
+    ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+  }
+  function tint(hex, k) {
+    var v = parseInt(hex.slice(1), 16), c = [v >> 16 & 255, v >> 8 & 255, v & 255].map(function (x) { return Math.round(x + (255 - x) * k); });
+    return "rgb(" + c.join(",") + ")";
+  }
+  function fitFont(ctx, text, size, maxW, weight) {
+    ctx.font = weight + " " + size + "px " + FONT;
+    var w = ctx.measureText(text).width;
+    if (w > maxW) { size = Math.max(14, Math.floor(size * maxW / w)); ctx.font = weight + " " + size + "px " + FONT; }
+    return size;
+  }
+  function ellipsize(ctx, text, maxW) {
+    if (ctx.measureText(text).width <= maxW) return text;
+    var a = Array.from(text);
+    while (a.length > 1 && ctx.measureText(a.join("") + "…").width > maxW) a.pop();
+    return a.join("") + "…";
+  }
+  function paintBg(ctx, b, W, H) {
+    if (b.grad) { var g = ctx.createLinearGradient(0, 0, W, H); g.addColorStop(0, b.grad[0]); g.addColorStop(1, b.grad[1]); ctx.fillStyle = g; }
+    else ctx.fillStyle = b.fill;
+    ctx.fillRect(0, 0, W, H);
+    if (b.grid) {
+      ctx.strokeStyle = b.grid; ctx.lineWidth = 1; ctx.beginPath();
+      for (var x = 40; x < W; x += 40) { ctx.moveTo(x + .5, 0); ctx.lineTo(x + .5, H); }
+      for (var y = 40; y < H; y += 40) { ctx.moveTo(0, y + .5); ctx.lineTo(W, y + .5); }
+      ctx.stroke();
+    }
+  }
+  function pairKey(r) { return r.from < r.to ? r.from + "|" + r.to : r.to + "|" + r.from; }
+  function toward(p, x, y, r) { var dx = x - p.x, dy = y - p.y, d = Math.hypot(dx, dy) || 1; return { x: p.x + dx / d * r, y: p.y + dy / d * r }; }
+  function quad(p0, c, p2, t) { var u = 1 - t; return { x: u * u * p0.x + 2 * u * t * c.x + t * t * p2.x, y: u * u * p0.y + 2 * u * t * c.y + t * t * p2.y }; }
+  // 線の形: 同じ2人の間に何本もあるときは、左右にずらした曲線にして、文字は矢印の元の人に寄せる
+  function relGeom(r, pairs, AH) {
+    var a = pById(r.from), b = pById(r.to);
+    if (!a || !b) return null;
+    var z = Z(), ra = rad(a) + 8, rb = rad(b) + 8;
+    if (Math.hypot(b.x - a.x, b.y - a.y) < ra + rb + AH * 2 + 12) return null; // 近すぎるときは線を描かない
+    var list = pairs[pairKey(r)], k = list.length, i = list.indexOf(r);
+    var s = a.id < b.id ? a : b, e = s === a ? b : a;
+    var dx = e.x - s.x, dy = e.y - s.y, d = Math.hypot(dx, dy) || 1;
+    var off = (i - (k - 1) / 2) * 72 * z;
+    var c = { x: (a.x + b.x) / 2 - dy / d * off * 2, y: (a.y + b.y) / 2 + dx / d * off * 2 };
+    var p0 = toward(a, c.x, c.y, ra), p2 = toward(b, c.x, c.y, rb);
+    var lp = quad(p0, c, p2, k > 1 ? .36 : .5);
+    return { p0: p0, c: c, p2: p2, lx: lp.x, ly: lp.y };
+  }
+  function arrowHead(ctx, tip, from, size) {
+    var ang = Math.atan2(tip.y - from.y, tip.x - from.x);
+    ctx.beginPath();
+    ctx.moveTo(tip.x, tip.y);
+    ctx.lineTo(tip.x - size * Math.cos(ang - .42), tip.y - size * Math.sin(ang - .42));
+    ctx.lineTo(tip.x - size * Math.cos(ang + .42), tip.y - size * Math.sin(ang + .42));
+    ctx.closePath(); ctx.fill();
+  }
+  function back(p, c, len) { var dx = p.x - c.x, dy = p.y - c.y, d = Math.hypot(dx, dy) || 1; return { x: p.x - dx / d * len, y: p.y - dy / d * len }; }
+  function isSel(kind, id) { return !!sel && sel.kind === kind && sel.id === id; }
+
+  function draw(ctx, opt) {
+    var W = dims()[0], H = dims()[1], b = BGS[state.bg], z = Z(), AH = 26 * z;
+    ctx.save();
+    ctx.setTransform(opt.scale, 0, 0, opt.scale, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    if (!opt.transparent) paintBg(ctx, b, W, H);
+    ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.lineJoin = "round"; ctx.lineCap = "butt";
+    if (state.title) {
+      fitFont(ctx, state.title, 58, W - 120, "bold");
+      ctx.fillStyle = b.text; ctx.fillText(state.title, W / 2, 66);
+    }
+    // 囲み
+    state.groups.forEach(function (g) {
+      var c = COLORS[g.color][1];
+      rr(ctx, g.x, g.y, g.w, g.h, 24);
+      ctx.globalAlpha = .1; ctx.fillStyle = c; ctx.fill(); ctx.globalAlpha = 1;
+      ctx.setLineDash([]); ctx.lineWidth = isSel("g", g.id) && opt.main ? 5 : 3; ctx.strokeStyle = b.dark ? tint(c, .3) : c; ctx.stroke();
+      if (g.label) {
+        fitFont(ctx, g.label, 26 * z, g.w - 70, "bold");
+        var lb = ellipsize(ctx, g.label, g.w - 70), tw = ctx.measureText(lb).width + 32;
+        rr(ctx, g.x + 18, g.y - 21 * z, tw, 42 * z, 21 * z); ctx.fillStyle = c; ctx.fill();
+        ctx.fillStyle = "#ffffff"; ctx.fillText(lb, g.x + 18 + tw / 2, g.y + 1);
+      }
+      if (opt.main && isSel("g", g.id)) { ctx.fillStyle = b.dark ? "#ffffff" : c; ctx.fillRect(g.x + g.w - 26, g.y + g.h - 26, 26, 26); }
+    });
+    // 線
+    var pairs = {}, geo = {}, hidden = 0;
+    state.rels.forEach(function (r) { var k = pairKey(r); (pairs[k] = pairs[k] || []).push(r); });
+    state.rels.forEach(function (r) {
+      var g = relGeom(r, pairs, AH);
+      geo[r.id] = g;
+      if (!g) { hidden++; return; }
+      var c = COLORS[r.color][1];
+      var s0 = r.type === "both" ? back(g.p0, g.c, AH * .7) : g.p0, s2 = r.type !== "none" ? back(g.p2, g.c, AH * .7) : g.p2;
+      function path(a, e) { ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.quadraticCurveTo(g.c.x, g.c.y, e.x, e.y); }
+      if (opt.main && isSel("r", r.id)) {
+        ctx.setLineDash([]); ctx.lineWidth = 18; ctx.strokeStyle = b.dark ? "rgba(255,255,255,.35)" : "rgba(0,0,0,.25)";
+        path(g.p0, g.p2); ctx.stroke();
+      }
+      ctx.setLineDash(r.dash ? [16 * z, 12 * z] : []);
+      if (b.dark) { ctx.lineWidth = 5 * z + 5; ctx.strokeStyle = "rgba(255,255,255,.6)"; path(s0, s2); ctx.stroke(); }
+      ctx.lineWidth = 5 * z; ctx.strokeStyle = c;
+      path(s0, s2); ctx.stroke();
+      ctx.setLineDash([]);
+      if (b.dark) {
+        ctx.fillStyle = "rgba(255,255,255,.6)";
+        if (r.type !== "none") arrowHead(ctx, back(g.p2, g.c, -2), g.c, AH + 6);
+        if (r.type === "both") arrowHead(ctx, back(g.p0, g.c, -2), g.c, AH + 6);
+      }
+      ctx.fillStyle = c;
+      if (r.type !== "none") arrowHead(ctx, g.p2, g.c, AH);
+      if (r.type === "both") arrowHead(ctx, g.p0, g.c, AH);
+    });
+    // 人
+    state.people.forEach(function (p) {
+      var r = rad(p), c = COLORS[p.color][1];
+      ctx.setLineDash([]);
+      ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+      ctx.fillStyle = tint(c, .86); ctx.fill();
+      var img = p.img && imgCache[p.img];
+      if (img && img._ok) {
+        ctx.save(); ctx.clip(); ctx.drawImage(img, p.x - r, p.y - r, r * 2, r * 2); ctx.restore();
+      } else {
+        ctx.fillStyle = c; ctx.font = "bold " + Math.round(r * .9) + "px " + FONT; ctx.fillText(firstChar(p.name), p.x, p.y + r * .05);
+      }
+      ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+      ctx.lineWidth = 7 * z; ctx.strokeStyle = c; ctx.stroke();
+      if (b.dark) { ctx.beginPath(); ctx.arc(p.x, p.y, r + 4 * z, 0, Math.PI * 2); ctx.lineWidth = 2; ctx.strokeStyle = "rgba(255,255,255,.7)"; ctx.stroke(); }
+      if (opt.main && (isSel("p", p.id) || connectFrom === p.id)) {
+        ctx.beginPath(); ctx.arc(p.x, p.y, r + 13, 0, Math.PI * 2);
+        ctx.setLineDash(connectFrom === p.id ? [] : [8, 6]); ctx.lineWidth = 4;
+        ctx.strokeStyle = connectFrom === p.id ? (b.dark ? "#d6c4ff" : "#6a3fb5") : (b.dark ? "#ffffff" : "#333333"); ctx.stroke(); ctx.setLineDash([]);
+      }
+      var ny = p.y + r + 32 * z;
+      if (p.name) {
+        fitFont(ctx, p.name, Math.round(34 * z), 440, "bold");
+        ctx.lineWidth = 7; ctx.strokeStyle = b.halo; ctx.strokeText(p.name, p.x, ny);
+        ctx.fillStyle = b.text; ctx.fillText(p.name, p.x, ny);
+        ny += 35 * z;
+      }
+      if (p.sub) {
+        fitFont(ctx, p.sub, Math.round(24 * z), 440, "normal");
+        ctx.lineWidth = 6; ctx.strokeStyle = b.halo; ctx.strokeText(p.sub, p.x, ny);
+        ctx.fillStyle = b.sub; ctx.fillText(p.sub, p.x, ny);
+      }
+    });
+    // 線の文字(人より上に描く)
+    if (opt.main) labelBoxes = {};
+    state.rels.forEach(function (r) {
+      var g = geo[r.id];
+      if (!g) return;
+      var c = COLORS[r.color][1];
+      if (r.label) {
+        ctx.font = "bold " + Math.round(28 * z) + "px " + FONT;
+        var bw = ctx.measureText(r.label).width + 30 * z, bh = 46 * z;
+        rr(ctx, g.lx - bw / 2, g.ly - bh / 2, bw, bh, bh / 2);
+        ctx.fillStyle = "#ffffff"; ctx.fill();
+        ctx.setLineDash([]); ctx.lineWidth = opt.main && isSel("r", r.id) ? 5 : 3; ctx.strokeStyle = c; ctx.stroke();
+        ctx.fillStyle = c; ctx.fillText(r.label, g.lx, g.ly + 1);
+        if (opt.main) labelBoxes[r.id] = { x: g.lx - bw / 2, y: g.ly - bh / 2, w: bw, h: bh, label: true };
+      } else if (opt.main) {
+        labelBoxes[r.id] = { x: g.lx - 20, y: g.ly - 20, w: 40, h: 40, label: false };
+      }
+    });
+    if (opt.credit) {
+      ctx.font = "18px " + FONT; ctx.textAlign = "right"; ctx.textBaseline = "alphabetic";
+      ctx.fillStyle = b.dark ? "rgba(255,255,255,.7)" : "rgba(0,0,0,.62)";
+      ctx.fillText("相関図メーカー uuhai0625.github.io/soukanzu-maker", W - 18, H - 14);
+    }
+    ctx.restore();
+    if (opt.main) hiddenCount = hidden;
+  }
+
+  var cv = $("cv"), cctx = cv.getContext("2d"), raf = 0;
+  function render() {
+    var d = dims();
+    if (cv.width !== d[0] || cv.height !== d[1]) { cv.width = d[0]; cv.height = d[1]; }
+    draw(cctx, { scale: 1, main: true, transparent: false, credit: exportOpts().credit });
+    $("relHidden").textContent = hiddenCount ? "人どうしが近すぎて表示されていない線が" + hiddenCount + "本あります(人を離すと出ます)。" : "";
+  }
+  function redraw() { if (raf) return; raf = requestAnimationFrame(function () { raf = 0; render(); }); }
+  function cacheImg(key) {
+    if (imgCache[key] || !IMGS[key]) return;
+    var im = new Image();
+    im.onload = function () { im._ok = im.naturalWidth > 0 && im.naturalWidth <= 600 && im.naturalHeight <= 600; redraw(); };
+    im.src = IMGS[key]; imgCache[key] = im;
+  }
+
+  // ===== 元に戻す・自動保存 =====
+  function pushHist() {
+    var s = JSON.stringify(state);
+    if (hist[hist.length - 1] !== s) hist.push(s);
+    if (hist.length > 40) hist.shift();
+    $("undoBtn").disabled = false;
+  }
+  function undo() {
+    var cur = JSON.stringify(state);
+    while (hist.length && hist[hist.length - 1] === cur) hist.pop();
+    if (!hist.length) { $("undoBtn").disabled = true; return; }
+    var prev = JSON.parse(hist.pop());
+    state = sanitize({ state: prev, imgs: IMGS }).state;
+    $("undoBtn").disabled = !hist.length;
+    stopConnect(); sel = null; renderAll(); saveLast();
+    setSt("st", "1つ前に戻しました。");
+  }
+  function pack() {
+    var used = {};
+    state.people.forEach(function (p) { if (p.img && IMGS[p.img]) used[p.img] = IMGS[p.img]; });
+    return { app: "soukanzu", v: 1, state: state, imgs: used };
+  }
+  var saveTimer = null, saveWarned = false;
+  function doSave() {
+    saveTimer = null;
+    try { localStorage.setItem(LAST_KEY, JSON.stringify(pack())); saveWarned = false; }
+    catch (e) { if (!saveWarned) { saveWarned = true; setSt("saveSt", "画像が多いため、このブラウザに自動保存できませんでした。画像を減らすか、画像で保存しておいてください。", true); } }
+  }
+  function saveLast() { clearTimeout(saveTimer); saveTimer = setTimeout(doSave, 400); }
+  function flushSave() { if (saveTimer) { clearTimeout(saveTimer); doSave(); } }
+  window.addEventListener("pagehide", flushSave);
+  document.addEventListener("visibilitychange", function () { if (document.visibilityState === "hidden") flushSave(); });
+  function applyData(d) {
+    Object.keys(d.imgs).forEach(function (k) {
+      if (IMGS[k] !== d.imgs[k]) { IMGS[k] = d.imgs[k]; delete imgCache[k]; }
+      cacheImg(k);
+    });
+    state = d.state;
+    if (![].some.call($("in-bg").options, function (o) { return o.value === state.bg; })) state.bg = "white";
+  }
+
+  // ===== 一覧(人物・線) =====
+  function colorSelect(val, label) {
+    var s = el("select", { "aria-label": label });
+    Object.keys(COLORS).forEach(function (k) { s.appendChild(el("option", { value: k }, COLORS[k][0])); });
+    s.value = val;
+    return s;
+  }
+  function mini(text, control) { var l = el("label", { class: "mini" }); l.appendChild(document.createTextNode(text)); l.appendChild(control); return l; }
+  function dispName(p, i) { return p.name.trim() || "(名前なし" + (i + 1) + ")"; }
+  var wide = window.matchMedia ? window.matchMedia("(min-width: 901px)") : { matches: true };
+  function setSel(kind, id, reveal) {
+    sel = kind ? { kind: kind, id: id } : null;
+    document.querySelectorAll(".item[data-id]").forEach(function (it) { it.classList.toggle("sel", !!sel && it.getAttribute("data-id") === sel.id); });
+    if (reveal && sel) {
+      var it = document.querySelector('.item[data-id="' + sel.id + '"]');
+      if (it && wide.matches && it.scrollIntoView) it.scrollIntoView({ block: "nearest" });
+      if (kind === "r") { var ri = state.rels.findIndex(function (r) { return r.id === id; }); setSt("st", "③の" + (ri + 1) + "本目の線を選びました。文字・向き・色は③で変えられます(ダブルクリックで入力欄へ)。"); }
+    }
+    redraw();
+  }
+  function textInput(val, max, label, ph, onIn) {
+    var t = el("input", { type: "text", maxlength: String(max), "aria-label": label, placeholder: ph });
+    t.value = val;
+    t.addEventListener("focus", pushHist);
+    t.addEventListener("input", function () { onIn(str(t.value, max)); redraw(); saveLast(); });
+    return t;
+  }
+  function focusIn(id, sel2) {
+    var it = id && document.querySelector('.item[data-id="' + id + '"]');
+    var t = it ? it.querySelector(sel2 || 'input[type="text"]') : null;
+    if (t) { t.focus({ preventScroll: !wide.matches }); return true; }
+    return false;
+  }
+  function syncLimits() {
+    var pf = state.people.length >= MAX_PEOPLE, rf = state.rels.length >= MAX_RELS;
+    $("peopleLimit").classList.toggle("hidden", !pf);
+    $("relLimit").classList.toggle("hidden", !rf);
+    $("addPersonBtn").disabled = pf;
+    $("addRelBtn").disabled = rf || state.people.length < 2;
+  }
+  function renderPeople() {
+    var box = $("peopleList");
+    box.innerHTML = "";
+    if (!state.people.length) box.appendChild(el("p", { class: "empty" }, "まだ人物がいません。「人物を追加」か、①のテンプレートから始めてください。"));
+    state.people.forEach(function (p, i) {
+      var n = i + 1, it = el("div", { class: "item" + (isSel("p", p.id) ? " sel" : ""), "data-id": p.id, role: "group", "aria-label": n + "人目の人物" });
+      it.style.borderLeftColor = COLORS[p.color][1];
+      var row = el("div", { class: "row2" });
+      row.appendChild(mini("名前", textInput(p.name, 16, n + "人目の名前", "例: 主人公", function (v) { p.name = v; updateNames(); })));
+      row.appendChild(mini("ひとこと", textInput(p.sub, 20, n + "人目のひとこと", "例: 高校2年", function (v) { p.sub = v; })));
+      it.appendChild(row);
+      var ctr = el("div", { class: "ctrls" });
+      var cs = colorSelect(p.color, n + "人目の色");
+      cs.addEventListener("change", function () { pushHist(); p.color = cs.value; it.style.borderLeftColor = COLORS[p.color][1]; redraw(); saveLast(); });
+      ctr.appendChild(mini("色", cs));
+      var ss = el("select", { "aria-label": n + "人目の丸の大きさ" });
+      Object.keys(SIZE_NAMES).forEach(function (k) { ss.appendChild(el("option", { value: k }, SIZE_NAMES[k])); });
+      ss.value = p.size;
+      ss.addEventListener("change", function () { pushHist(); p.size = ss.value; clampP(p); redraw(); saveLast(); });
+      ctr.appendChild(mini("丸の大きさ", ss));
+      var lb = el("label", { class: "btn small" }, p.img ? "画像を変える" : "画像を選ぶ");
+      var fi = el("input", { type: "file", accept: "image/png,image/jpeg,image/gif,image/webp,image/bmp", class: "vh", "aria-label": n + "人目の画像を選ぶ" });
+      fi.addEventListener("change", function () { var f = fi.files && fi.files[0]; fi.value = ""; if (f) setImage(p.id, f); });
+      lb.appendChild(fi);
+      ctr.appendChild(lb);
+      if (p.img) {
+        var rm = el("button", { type: "button", class: "btn small", "aria-label": n + "人目の画像を外す" }, "画像を外す");
+        rm.addEventListener("click", function () { pushHist(); p.img = ""; renderPeople(); redraw(); saveLast(); focusIn(p.id, "input[type=file]"); setSt("peopleSt", n + "人目の画像を外しました。"); });
+        ctr.appendChild(rm);
+      }
+      var del = el("button", { type: "button", class: "btn small", "aria-label": n + "人目(" + dispName(p, i) + ")を削除" }, "削除");
+      del.addEventListener("click", function () { removePerson(p.id); });
+      ctr.appendChild(del);
+      it.appendChild(ctr);
+      it.addEventListener("focusin", function () { if (!isSel("p", p.id)) setSel("p", p.id); });
+      box.appendChild(it);
+    });
+    $("peopleCount").textContent = state.people.length + "人(" + MAX_PEOPLE + "人まで)";
+    syncLimits();
+  }
+  function personSelect(val, label) {
+    var s = el("select", { "aria-label": label });
+    state.people.forEach(function (p, i) { s.appendChild(el("option", { value: p.id, "data-pid": p.id }, dispName(p, i))); });
+    s.value = val;
+    return s;
+  }
+  function updateNames() {
+    document.querySelectorAll("option[data-pid]").forEach(function (o) {
+      var id = o.getAttribute("data-pid"), i = state.people.findIndex(function (p) { return p.id === id; });
+      if (i >= 0) o.textContent = dispName(state.people[i], i);
+    });
+  }
+  function renderRels() {
+    var box = $("relList");
+    box.innerHTML = "";
+    if (!state.rels.length) box.appendChild(el("p", { class: "empty" }, state.people.length < 2 ? "線を引くには、人物を2人以上入れてください。" : "まだ線がありません。"));
+    state.rels.forEach(function (r, i) {
+      var n = i + 1, it = el("div", { class: "item" + (isSel("r", r.id) ? " sel" : ""), "data-id": r.id, role: "group", "aria-label": n + "本目の線" });
+      it.style.borderLeftColor = COLORS[r.color][1];
+      it.appendChild(mini("線の文字", textInput(r.label, 20, n + "本目の線の文字", "例: 好き・ライバル", function (v) { r.label = v; })));
+      var row = el("div", { class: "row2", style: "margin-top:6px;" });
+      var fs = personSelect(r.from, n + "本目の線の元(矢印が出る人)"), ts = personSelect(r.to, n + "本目の線の先(矢印が向く人)");
+      function onPeople(which, s) {
+        return function () {
+          var other = which === "from" ? r.to : r.from;
+          if (s.value === other) { s.value = r[which]; setSt("relSt", "同じ人どうしは線でつなげません。", true); return; }
+          pushHist(); r[which] = s.value; redraw(); saveLast(); setSt("relSt", "");
+        };
+      }
+      fs.addEventListener("change", onPeople("from", fs));
+      ts.addEventListener("change", onPeople("to", ts));
+      row.appendChild(mini("矢印の元", fs)); row.appendChild(el("span", { class: "arrow-mid", "aria-hidden": "true" }, "→")); row.appendChild(mini("矢印の先", ts));
+      it.appendChild(row);
+      var ctr = el("div", { class: "ctrls" });
+      var ty = el("select", { "aria-label": n + "本目の線の向き" });
+      Object.keys(TYPES).forEach(function (k) { ty.appendChild(el("option", { value: k }, TYPES[k])); });
+      ty.value = r.type;
+      ty.addEventListener("change", function () { pushHist(); r.type = ty.value; redraw(); saveLast(); });
+      ctr.appendChild(mini("向き", ty));
+      var cs = colorSelect(r.color, n + "本目の線の色");
+      cs.addEventListener("change", function () { pushHist(); r.color = cs.value; it.style.borderLeftColor = COLORS[r.color][1]; redraw(); saveLast(); });
+      ctr.appendChild(mini("色", cs));
+      var dl = el("label", { class: "check" }), dc = el("input", { type: "checkbox" });
+      dc.checked = r.dash;
+      dc.addEventListener("change", function () { pushHist(); r.dash = dc.checked; redraw(); saveLast(); });
+      dl.appendChild(dc); dl.appendChild(document.createTextNode("点線"));
+      ctr.appendChild(dl);
+      var del = el("button", { type: "button", class: "btn small", "aria-label": n + "本目の線を削除" }, "削除");
+      del.addEventListener("click", function () {
+        pushHist();
+        var idx = state.rels.indexOf(r);
+        state.rels = state.rels.filter(function (x) { return x.id !== r.id; });
+        if (isSel("r", r.id)) sel = null;
+        renderRels(); redraw(); saveLast();
+        var next = state.rels[Math.min(idx, state.rels.length - 1)];
+        if (!(next && focusIn(next.id))) ($("addRelBtn").disabled ? $("addPersonBtn") : $("addRelBtn")).focus();
+        setSt("relSt", n + "本目の線を削除しました(「1つ戻す」で元に戻せます)。");
+      });
+      ctr.appendChild(del);
+      it.appendChild(ctr);
+      it.addEventListener("focusin", function () { if (!isSel("r", r.id)) setSel("r", r.id); });
+      box.appendChild(it);
+    });
+    $("relCount").textContent = state.rels.length + "本(" + MAX_RELS + "本まで)";
+    syncLimits();
+  }
+  function renderAll() {
+    renderPeople(); renderRels(); renderGroups();
+    $("in-title").value = state.title; $("in-size").value = state.size; $("in-zoom").value = state.zoom; $("in-bg").value = state.bg;
+    redraw();
+  }
+
+  // ===== 人物・線の追加と削除 =====
+  function freeSpot() {
+    var W = dims()[0], H = dims()[1], best = null, bestD = -1;
+    for (var gy = 0; gy < 6; gy++) for (var gx = 0; gx < 8; gx++) {
+      var c = { size: "m", x: W * (gx + .5) / 8, y: H * (gy + .5) / 6 };
+      clampP(c);
+      var d = Infinity;
+      state.people.forEach(function (p) { d = Math.min(d, Math.hypot(p.x - c.x, p.y - c.y)); });
+      if (d > bestD) { bestD = d; best = c; }
+    }
+    return best;
+  }
+  function addPerson() {
+    if (state.people.length >= MAX_PEOPLE) { syncLimits(); return; }
+    pushHist();
+    var sp = freeSpot(), keys = Object.keys(COLORS);
+    var p = { id: uid("p"), name: "人物" + (state.people.length + 1), sub: "", color: keys[state.people.length % keys.length], size: "m", img: "", x: sp.x, y: sp.y };
+    clampP(p);
+    state.people.push(p);
+    sel = { kind: "p", id: p.id };
+    renderPeople(); renderRels(); redraw(); saveLast();
+    if (focusIn(p.id)) { var t = document.activeElement; if (t && t.select) t.select(); }
+    setSt("peopleSt", "「" + p.name + "」を追加しました。名前を書きかえてください。");
+  }
+  function removePerson(id) {
+    var i = state.people.findIndex(function (p) { return p.id === id; });
+    if (i < 0) return;
+    pushHist();
+    var name = dispName(state.people[i], i), before = state.rels.length;
+    state.people.splice(i, 1);
+    state.rels = state.rels.filter(function (r) { return r.from !== id && r.to !== id; });
+    var lost = before - state.rels.length;
+    if (sel && (sel.id === id || (sel.kind === "r" && !rById(sel.id)))) sel = null;
+    if (connectFrom === id) connectFrom = null;
+    renderPeople(); renderRels(); redraw(); saveLast();
+    var next = state.people[Math.min(i, state.people.length - 1)];
+    if (!(next && focusIn(next.id))) $("addPersonBtn").focus();
+    setSt("peopleSt", "「" + name + "」" + (lost ? "と、つながっていた線" + lost + "本" : "") + "を削除しました(「1つ戻す」で元に戻せます)。");
+  }
+  function addRel(from, to, focus) {
+    if (state.rels.length >= MAX_RELS) { syncLimits(); setSt("st", "線はこれ以上引けません(③の下を見てください)。", true); return null; }
+    pushHist();
+    var a = pById(from), r = { id: uid("r"), from: from, to: to, label: "", type: "one", color: a ? a.color : "gray", dash: false };
+    state.rels.push(r);
+    sel = { kind: "r", id: r.id };
+    renderPeople(); renderRels(); redraw(); saveLast();
+    if (focus) focusIn(r.id);
+    return r;
+  }
+  $("addPersonBtn").addEventListener("click", addPerson);
+  $("addRelBtn").addEventListener("click", function () {
+    if (state.people.length < 2) { setSt("relSt", "線を引くには、人物を2人以上入れてください。", true); return; }
+    var a = sel && sel.kind === "p" ? sel.id : state.people[0].id;
+    var b = state.people.filter(function (p) { return p.id !== a; })[0].id;
+    if (addRel(a, b, true)) setSt("relSt", "線を追加しました。矢印の元と先の人を選んでください。");
+  });
+
+  // ===== 画像(正方形に切り抜いて小さくしてから使う) =====
+  function setImage(pid, file) {
+    if (/svg/i.test(file.type || "") || /\.svg$/i.test(file.name || "")) { setSt("peopleSt", "SVG画像は使えません。PNGかJPEGを選んでください。", true); return; }
+    if (!/^image\//.test(file.type || "") && !/\.(jpe?g|png|gif|webp|bmp)$/i.test(file.name || "")) { setSt("peopleSt", "画像ファイルを選んでください。", true); return; }
+    if (file.size > 30 * 1024 * 1024) { setSt("peopleSt", "画像が大きすぎます(30MBまで)。", true); return; }
+    var url = URL.createObjectURL(file), img = new Image();
+    img.onload = function () {
+      var w = img.naturalWidth, h = img.naturalHeight, s = Math.min(w, h), data = "";
+      URL.revokeObjectURL(url);
+      if (!s || w * h > 60000000) { setSt("peopleSt", s ? "画像の画素数が多すぎます。小さくしてから選んでください。" : "この画像は読み込めませんでした。", true); return; }
+      try {
+        var c = document.createElement("canvas"); c.width = c.height = 240;
+        var g = c.getContext("2d");
+        g.fillStyle = "#ffffff"; g.fillRect(0, 0, 240, 240);
+        g.drawImage(img, (w - s) / 2, (h - s) / 2, s, s, 0, 0, 240, 240);
+        data = c.toDataURL("image/jpeg", 0.86);
+      } catch (e) { data = ""; }
+      if (!/^data:image\/jpeg;base64,/.test(data)) { setSt("peopleSt", "この画像は使えませんでした。別の画像を選んでください。", true); return; }
+      var cur = pById(pid);
+      if (!cur) return; // 読み込み中に消された
+      var key = uid("i");
+      IMGS[key] = data; cacheImg(key);
+      pushHist(); cur.img = key;
+      renderPeople(); redraw(); saveLast();
+      focusIn(pid, "input[type=file]");
+      setSt("peopleSt", "画像を入れました(まん中を正方形に切り抜いています)。");
+    };
+    img.onerror = function () { URL.revokeObjectURL(url); setSt("peopleSt", "この画像は読み込めませんでした(HEICなどは、JPEGかPNGにしてから選んでください)。", true); };
+    img.src = url;
+  }
+
+  // ===== 図の上の操作(ドラッグ・選択・線でつなぐ) =====
+  function pt(e) {
+    var b = cv.getBoundingClientRect();
+    return { x: (e.clientX - b.left) * cv.width / b.width, y: (e.clientY - b.top) * cv.height / b.height, k: cv.width / b.width };
+  }
+  // k: 画面1pxが図の何pxか。スマホで小さく表示されていても、指で押しやすい広さを取る
+  function hit(x, y, k, peopleOnly) {
+    var i, bx;
+    function inBox(b) { var pad = Math.max(4, (44 * k - b.h) / 2); return x >= b.x - pad && x <= b.x + b.w + pad && y >= b.y - pad && y <= b.y + b.h + pad; }
+    if (!peopleOnly) for (i = state.rels.length - 1; i >= 0; i--) {
+      bx = labelBoxes[state.rels[i].id];
+      if (bx && bx.label && inBox(bx)) return { kind: "r", id: state.rels[i].id };
+    }
+    for (i = state.people.length - 1; i >= 0; i--) {
+      var p = state.people[i];
+      if (Math.hypot(x - p.x, y - p.y) <= Math.max(rad(p) + 8, 22 * k)) return { kind: "p", id: p.id };
+    }
+    if (peopleOnly) return null;
+    for (i = state.rels.length - 1; i >= 0; i--) {
+      bx = labelBoxes[state.rels[i].id];
+      if (bx && !bx.label && inBox(bx)) return { kind: "r", id: state.rels[i].id };
+    }
+    for (i = state.groups.length - 1; i >= 0; i--) {
+      var g = state.groups[i], hk = Math.max(36, 22 * k);
+      if (x >= g.x + g.w - hk && x <= g.x + g.w + 8 && y >= g.y + g.h - hk && y <= g.y + g.h + 8) return { kind: "g", id: g.id, mode: "resize" };
+      if (x >= g.x && x <= g.x + g.w && y >= g.y - 22 && y <= g.y + g.h) return { kind: "g", id: g.id, mode: "move" };
+    }
+    return null;
+  }
+  function stopConnect() {
+    connecting = false; connectFrom = null;
+    cv.classList.remove("connecting");
+    $("connectBtn").textContent = "線でつなぐ"; $("connectBtn").classList.remove("on");
+  }
+  $("connectBtn").addEventListener("click", function () {
+    if (connecting) { stopConnect(); setSt("st", ""); redraw(); return; }
+    if (state.people.length < 2) { setSt("st", "線を引くには、人物を2人以上入れてください。", true); return; }
+    if (state.rels.length >= MAX_RELS) { syncLimits(); setSt("st", "線はこれ以上引けません(③の下を見てください)。", true); return; }
+    connecting = true; connectFrom = sel && sel.kind === "p" ? sel.id : null;
+    cv.classList.add("connecting");
+    $("connectBtn").textContent = "線を引くのをやめる"; $("connectBtn").classList.add("on");
+    setSt("st", connectFrom ? "矢印の先の人を、図の上で押してください。" : "矢印の元の人 → 先の人の順に、図の上で人を押してください。");
+    redraw();
+  });
+  function connectTap(id) {
+    if (!connectFrom) { connectFrom = id; setSt("st", "次に、矢印の先の人を押してください。"); redraw(); return; }
+    if (id === connectFrom) { connectFrom = null; setSt("st", "えらび直してください。矢印の元の人を押します。"); redraw(); return; }
+    var from = connectFrom;
+    stopConnect();
+    var r = addRel(from, id, wide.matches);
+    if (r) setSt("st", "線を引きました。③の" + state.rels.length + "本目で、線の文字・向き・色を変えられます。");
+  }
+  // 囲みの中にいる人と、中にすっぽり入っている囲み
+  function membersOf(g) {
+    var ps = state.people.filter(function (p) { return p.x >= g.x && p.x <= g.x + g.w && p.y >= g.y && p.y <= g.y + g.h; }).map(function (p) { return { o: p, x: p.x, y: p.y, b: boundsIn(state, p) }; });
+    var gs = state.groups.filter(function (h) { return h !== g && h.x >= g.x && h.y >= g.y && h.x + h.w <= g.x + g.w && h.y + h.h <= g.y + g.h; }).map(function (h) { return { o: h, x: h.x, y: h.y, g: true }; });
+    return ps.concat(gs);
+  }
+  // 囲みと中身を同じだけ動かす(誰もはみ出さない範囲で)
+  function moveGroup(g, ox, oy, members, dx, dy) {
+    var W = dims()[0], H = dims()[1], lx = -ox, hx = W - g.w - ox, ly = 24 - oy, hy = H - g.h - oy;
+    members.forEach(function (m) {
+      var x0 = m.g ? 0 : m.b.x0, x1 = m.g ? W - m.o.w : m.b.x1, y0 = m.g ? 24 : m.b.y0, y1 = m.g ? H - m.o.h : m.b.y1;
+      lx = Math.max(lx, x0 - m.x); hx = Math.min(hx, x1 - m.x); ly = Math.max(ly, y0 - m.y); hy = Math.min(hy, y1 - m.y);
+    });
+    var mx = lx > hx ? 0 : Math.max(lx, Math.min(hx, dx)), my = ly > hy ? 0 : Math.max(ly, Math.min(hy, dy));
+    g.x = ox + mx; g.y = oy + my;
+    members.forEach(function (m) { m.o.x = m.x + mx; m.o.y = m.y + my; });
+  }
+  cv.addEventListener("pointerdown", function (e) {
+    if (e.button > 0 || drag) return;
+    try { cv.focus({ preventScroll: true }); } catch (err) {}
+    var q = pt(e), h = hit(q.x, q.y, q.k, connecting);
+    if (connecting) { if (h) connectTap(h.id); return; }
+    var wrap = $("cvWrap");
+    if (!h) {
+      setSel(null);
+      if (wrap.classList.contains("zoom")) { drag = { pan: true, pid: e.pointerId, cx: e.clientX, cy: e.clientY, sl: wrap.scrollLeft, st: wrap.scrollTop }; try { cv.setPointerCapture(e.pointerId); } catch (err) {} e.preventDefault(); }
+      return;
+    }
+    setSel(h.kind, h.id, true);
+    if (h.kind === "r") return;
+    var o = h.kind === "p" ? pById(h.id) : gById(h.id);
+    drag = { kind: h.kind, mode: h.mode || "move", o: o, pid: e.pointerId, sx: q.x, sy: q.y, ox: o.x, oy: o.y, ow: o.w, oh: o.h, k: q.k, moved: false, members: h.kind === "g" && h.mode === "move" ? membersOf(o) : null };
+    try { cv.setPointerCapture(e.pointerId); } catch (err) {}
+    e.preventDefault();
+  });
+  cv.addEventListener("pointermove", function (e) {
+    if (!drag || e.pointerId !== drag.pid) return;
+    if (drag.pan) { var w = $("cvWrap"); w.scrollLeft = drag.sl - (e.clientX - drag.cx); w.scrollTop = drag.st - (e.clientY - drag.cy); return; }
+    var q = pt(e), dx = q.x - drag.sx, dy = q.y - drag.sy, W = dims()[0], H = dims()[1], o = drag.o;
+    if (!drag.moved) { if (Math.hypot(dx, dy) < 5 * drag.k) return; pushHist(); drag.moved = true; }
+    if (drag.kind === "p") { o.x = drag.ox + dx; o.y = drag.oy + dy; clampP(o); }
+    else if (drag.mode === "resize") { o.w = Math.max(160, Math.min(W - o.x, drag.ow + dx)); o.h = Math.max(120, Math.min(H - o.y, drag.oh + dy)); }
+    else moveGroup(o, drag.ox, drag.oy, drag.members, dx, dy);
+    redraw();
+  });
+  function endDrag(e) { if (!drag || (e && e.pointerId !== drag.pid)) return; if (drag.moved) saveLast(); drag = null; }
+  cv.addEventListener("pointerup", endDrag);
+  cv.addEventListener("pointercancel", endDrag);
+  cv.addEventListener("lostpointercapture", endDrag);
+  cv.addEventListener("dblclick", function (e) {
+    var q = pt(e), h = hit(q.x, q.y, q.k);
+    if (h && h.kind !== "g") focusIn(h.id);
+  });
+  var kbMoving = false;
+  function kbDone() { if (kbMoving) { kbMoving = false; saveLast(); } }
+  cv.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") { if (connecting) stopConnect(); setSel(null); setSt("st", ""); return; }
+    if ((e.key === "n" || e.key === "N") && state.people.length) {
+      var i = sel && sel.kind === "p" ? state.people.findIndex(function (p) { return p.id === sel.id; }) : -1;
+      var p = state.people[(i + (e.shiftKey ? state.people.length - 1 : 1)) % state.people.length];
+      setSel("p", p.id); setSt("st", "「" + dispName(p, state.people.indexOf(p)) + "」を選びました。矢印キーで動かせます。");
+      return;
+    }
+    var dirs = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }, d = dirs[e.key];
+    if (!d) return;
+    if (!sel || sel.kind === "r") { setSt("st", "Nキーで人を選んでから、矢印キーで動かせます。"); return; }
+    var o = sel.kind === "p" ? pById(sel.id) : gById(sel.id);
+    if (!o) return;
+    e.preventDefault();
+    if (!kbMoving) { pushHist(); kbMoving = true; }
+    var step = e.shiftKey ? 2 : 12;
+    if (sel.kind === "p") { o.x += d[0] * step; o.y += d[1] * step; clampP(o); }
+    else moveGroup(o, o.x, o.y, membersOf(o), d[0] * step, d[1] * step);
+    redraw();
+  });
+  cv.addEventListener("keyup", kbDone);
+  cv.addEventListener("blur", kbDone);
+
+  $("undoBtn").addEventListener("click", undo);
+  $("zoomBtn").addEventListener("click", function () {
+    var on = $("cvWrap").classList.toggle("zoom");
+    $("zoomBtn").textContent = on ? "拡大をやめる" : "図を拡大";
+    $("zoomBtn").setAttribute("aria-pressed", String(on));
+  });
+  $("arrangeBtn").addEventListener("click", function () {
+    var n = state.people.length;
+    if (!n) { setSt("st", "人物がいません。", true); return; }
+    pushHist();
+    var z = Z(), rm = R.m * z, b = boundsIn(state, { size: "m" }), msg = "並べ直しました(「1つ戻す」で元に戻せます)。";
+    var x0 = b.x0, x1 = b.x1, y0 = b.y0, y1 = b.y1, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, rx = (x1 - x0) / 2, ry = (y1 - y0) / 2;
+    var gap = 2 * rm + 90 * z; // となりの人との間(名前の文字ぶんも空ける)
+    if (n === 1) { state.people[0].x = cx; state.people[0].y = cy; }
+    else if (2 * Math.PI * Math.min(rx, ry) / n >= gap) {
+      state.people.forEach(function (p, i) { var a = -Math.PI / 2 + i * 2 * Math.PI / n; p.x = cx + Math.cos(a) * rx; p.y = cy + Math.sin(a) * ry; });
+    } else {
+      // 円に入りきらないときは、格子に並べる
+      var cols = Math.max(1, Math.round(Math.sqrt(n * (x1 - x0 + 1) / (y1 - y0 + 1)))), rows = Math.ceil(n / cols);
+      state.people.forEach(function (p, i) {
+        var c = i % cols, r = Math.floor(i / cols);
+        p.x = cols === 1 ? cx : x0 + (x1 - x0) * c / (cols - 1);
+        p.y = rows === 1 ? cy : y0 + (y1 - y0) * r / (rows - 1);
+      });
+      if ((x1 - x0) / Math.max(1, cols - 1) < gap * .8 || (y1 - y0) / Math.max(1, rows - 1) < gap * .8) msg = "人数が多いため重なっています。①の「文字と丸の大きさ」を小さめにするか、ほかの画像の形を試してください。";
+    }
+    state.people.forEach(clampP);
+    redraw(); saveLast();
+    setSt("st", msg);
+  });
+
+  // ===== 図の設定 =====
+  $("in-title").addEventListener("focus", pushHist);
+  $("in-title").addEventListener("input", function () { state.title = str($("in-title").value, 30); state.people.forEach(clampP); redraw(); saveLast(); });
+  function rescale(fn) {
+    pushHist();
+    var o = dims();
+    fn();
+    var n = dims(), kx = n[0] / o[0], ky = n[1] / o[1];
+    state.people.forEach(function (p) { p.x *= kx; p.y *= ky; clampP(p); });
+    state.groups.forEach(function (g) { g.w = Math.max(160, Math.min(n[0], g.w * kx)); g.h = Math.max(120, Math.min(n[1] - 24, g.h * ky)); g.x = Math.max(0, Math.min(n[0] - g.w, g.x * kx)); g.y = Math.max(24, Math.min(n[1] - g.h, g.y * ky)); });
+    redraw(); saveLast();
+  }
+  $("in-size").addEventListener("change", function () {
+    var v = $("in-size").value;
+    if (own(SIZES, v) && v !== state.size) rescale(function () { state.size = v; });
+  });
+  $("in-zoom").addEventListener("change", function () {
+    var v = $("in-zoom").value;
+    if (own(ZOOMS, v) && v !== state.zoom) rescale(function () { state.zoom = v; });
+  });
+  $("in-bg").addEventListener("change", function () {
+    if (!own(BGS, $("in-bg").value)) return;
+    pushHist(); state.bg = $("in-bg").value; redraw(); saveLast();
+  });
+  document.querySelectorAll("[data-tpl]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var k = b.getAttribute("data-tpl"), has = state.people.length || state.title;
+      if (has && !confirm(k === "clear" ? "人物と線をすべて消しますか?(「1つ戻す」で元に戻せます)" : "今の図を消して、テンプレートに入れかえますか?(「1つ戻す」で元に戻せます)")) return;
+      pushHist();
+      if (k === "clear") { var s = blank(); s.size = state.size; s.zoom = state.zoom; s.bg = state.bg; state = s; }
+      else { state = fromTpl(TPL[k]); track("soukanzu_template", { tpl: k }); }
+      stopConnect(); sel = null; renderAll(); saveLast();
+      setSt("st", k === "clear" ? "全部消しました。" : "テンプレートを入れました。名前や線の文字を書きかえてください。");
+    });
+  });
+
+  // ===== 画像で保存 =====
+  function fileName() { return Array.from((state.title.trim() || "相関図").replace(/[\\\/:*?"<>|\s]+/g, "_")).slice(0, 40).join(""); }
+  function download(blob, name) {
+    var a = document.createElement("a"), url = URL.createObjectURL(blob);
+    a.href = url; a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
+  }
+  $("pngBtn").addEventListener("click", function () {
+    if (!state.people.length) { setSt("saveSt", "人物を1人以上入れてください。", true); return; }
+    var o = exportOpts(), d = dims(), c = document.createElement("canvas");
+    c.width = d[0] * o.scale; c.height = d[1] * o.scale;
+    var ctx = c.getContext("2d");
+    if (!ctx) { setSt("saveSt", "画像を作れませんでした。", true); return; }
+    draw(ctx, { scale: o.scale, transparent: o.transparent, credit: o.credit });
+    c.toBlob(function (blob) {
+      if (!blob) { setSt("saveSt", "画像を作れませんでした(大きすぎる可能性があります。画質を下げてください)。", true); return; }
+      download(blob, fileName() + ".png");
+      setSt("saveSt", "画像を保存しました(" + c.width + "×" + c.height + ")。");
+      track("soukanzu_png", { people: state.people.length, rels: state.rels.length, scale: o.scale });
+    }, "image/png");
+  });
+
+  
+
+  if (EDITION !== "full") {
+    $("privacyNote").innerHTML = '入力した内容や画像はどこにも送信されません(すべてこのブラウザの中で処理します)。このページでは利用状況の把握のためにアクセス解析(Google Analytics)を使っています。<a href="https://policies.google.com/technologies/partner-sites?hl=ja" target="_blank" rel="noopener">Googleによるデータの使用について</a>';
+  }
+
+  // ===== はじめの表示: 前回の続き、なければテンプレート =====
+  try {
+    var loaded = JSON.parse(localStorage.getItem(LAST_KEY) || "null");
+    if (loaded) applyData(sanitize(loaded));
+    else state = fromTpl(TPL.school);
+    renderAll();
+  } catch (e) {
+    try { localStorage.removeItem(LAST_KEY); } catch (e2) {}
+    state = blank(); state = fromTpl(TPL.school); renderAll();
+    setSt("st", "前回の図を読み込めなかったため、テンプレートから始めます。", true);
+  }
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(redraw);
+})();
+</script>
+</body>
+</html>
